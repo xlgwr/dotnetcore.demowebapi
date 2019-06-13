@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using demowebapi.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using EasyCaching.Core;
 
 namespace demowebapi.Controllers
 {
@@ -15,28 +16,53 @@ namespace demowebapi.Controllers
     public class ValuesController : ControllerBase
     {
         private readonly ILogger<ValuesController> _logger;
-        private readonly IHttpClientFactory _httpClientFactory;
+        private IHttpClientFactory _httpClientFactory;
 
-        public ValuesController(ILogger<ValuesController> logger, IHttpClientFactory httpClientFactory)
+        private readonly IEasyCachingProvider _provider;
+
+        public ValuesController(
+            ILogger<ValuesController> logger,
+        IHttpClientFactory httpClientFactory,
+        IEasyCachingProvider provider
+        )
         {
             _logger = logger;
             _httpClientFactory = httpClientFactory;
+            this._provider = provider;
         }
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public async Task<ActionResult<IEnumerable<string>>> Get()
         {
             _logger.LogInformation("正在调用接口 GET api/values ");
 
-            return new string[] { "value1", "value2" };
+            var client = _httpClientFactory.CreateClient("cnblogs");
+            var result = await client.GetStringAsync("xlgwr");
+
+            //Remove
+            _provider.Remove("demo");
+
+            //Set
+            _provider.Set("demo", result, TimeSpan.FromMinutes(1));
+
+
+            return new string[] { "value1", "value2", result };
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public async Task<object> Get(int id)
+        public async Task<ActionResult<object>> Get(int id)
         {
-            var client = _httpClientFactory.CreateClient();
-            var result = await client.GetStringAsync("http://www.baidu.com/");
+            //get 
+            
+            var client = _httpClientFactory.CreateClient("baidu");
+            var content = new string("s?ie=utf-8&f=8&rsv_bp=1&rsv_idx=1&tn=baidu&wd=" + id);
+            var result = await client.GetStringAsync(content);
+
+
+            //Set
+            _provider.Set(id+"", result, TimeSpan.FromMinutes(1));
+
             Thread.Sleep(id);
             return new { id, result };
         }
