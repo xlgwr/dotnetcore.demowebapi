@@ -30,7 +30,12 @@ namespace demowebapi
         {
             services.AddHttpClient();
             services.AddMvc(
-                Options => { Options.Filters.Add(new LogHttpRequestAttribute()); }
+                Options => 
+                {
+                    Options.Filters.Add(new LogHttpRequestAttribute());
+                    Options.Filters.Add(typeof(GlobalExceptions));
+                    
+                }
 
             ).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
