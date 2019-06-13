@@ -45,7 +45,7 @@ namespace demowebapi
             //Important step for Redis Caching
             services.AddEasyCaching(option =>
             {
-                option.UseRedis(Configuration, "easycaching.redis");
+                option.UseRedis(Configuration,"redis1");
             });
 
             //httpclient
