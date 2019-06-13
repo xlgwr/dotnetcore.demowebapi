@@ -19,16 +19,20 @@ namespace demowebapi.Controllers
         private IHttpClientFactory _httpClientFactory;
 
         private readonly IEasyCachingProvider _provider;
+        private readonly IRedisCachingProvider _redisProvider;
+
 
         public ValuesController(
             ILogger<ValuesController> logger,
         IHttpClientFactory httpClientFactory,
-        IEasyCachingProvider provider
+        IEasyCachingProvider provider,
+        IEasyCachingProviderFactory providerFactory
         )
         {
             _logger = logger;
             _httpClientFactory = httpClientFactory;
             this._provider = provider;
+            this._redisProvider = providerFactory.GetRedisProvider("redis1");
         }
         // GET api/values
         [HttpGet]
