@@ -20,6 +20,10 @@ using Microsoft.AspNetCore.Http;
 using EasyCaching.Core;
 using EasyCaching.Redis;
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using demowebapi.Config;
+
 namespace demowebapi
 {
     public class Startup
@@ -40,12 +44,37 @@ namespace demowebapi
             var fallbackResponse = new HttpResponseMessage();
             fallbackResponse.Content = new StringContent("fallback 回调报错：");
             fallbackResponse.StatusCode = System.Net.HttpStatusCode.TooManyRequests;
+            //jwt
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(
+                options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateLifetime = true,//是否验证失效时间
+                        ClockSkew = TimeSpan.FromSeconds(30),
 
+                        ValidateAudience = true,//是否验证Audience
+                                                //ValidAudience = Const.GetValidudience(),//Audience
+                                                //这里采用动态验证的方式，在重新登陆时，刷新token，旧token就强制失效了
+                        AudienceValidator = (m, n, z) =>
+                        {
+                            return m != null && m.FirstOrDefault().Equals(Consts.ValidAudience);
+                        },
+                        ValidateIssuer = true,//是否验证Issuer
+                        ValidIssuer = Consts.Domain,//Issuer，这两项和前面签发jwt的设置一致
+
+                        ValidateIssuerSigningKey = true,//是否验证SecurityKey
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Consts.SecurityKey))//拿到SecurityKey
+
+                    };
+                }
+            );
             //redis
             //Important step for Redis Caching
             services.AddEasyCaching(option =>
             {
-                option.UseRedis(Configuration,"redis1");
+                option.UseRedis(Configuration, "redis1");
             });
 
             //httpclient
@@ -88,6 +117,8 @@ namespace demowebapi
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            app.UseAuthentication();
 
             if (env.IsDevelopment())
             {

@@ -8,9 +8,11 @@ using demowebapi.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using EasyCaching.Core;
+using Microsoft.AspNetCore.Authorization;
 
 namespace demowebapi.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ValuesController : ControllerBase
