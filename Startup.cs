@@ -55,7 +55,7 @@ namespace demowebapi {
                     options => {
                         options.TokenValidationParameters = new TokenValidationParameters {
                             ValidateLifetime = true, //是否验证失效时间
-                                ClockSkew = TimeSpan.FromSeconds (60),
+                                ClockSkew = TimeSpan.FromHours (1),
 
                                 ValidateAudience = true, //是否验证Audience
                                 //ValidAudience = Const.GetValidudience(),//Audience
