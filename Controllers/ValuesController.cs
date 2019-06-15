@@ -84,7 +84,7 @@ namespace demowebapi.Controllers {
         public void Delete (int id) { }
 
         #region books
-        [HttpGet("/books")]
+        [HttpGet ("/books")]
         public ActionResult<List<Book>> GetBooks () =>
             _bookService.Get ();
 
@@ -98,7 +98,7 @@ namespace demowebapi.Controllers {
             return book;
         }
 
-        [HttpPost("/books")]
+        [HttpPost ("/books")]
         public ActionResult<Book> CreateBook (Book book) {
             if (book.Id.IsNullToString ().Length != 24) {
                 book.Id = "";
