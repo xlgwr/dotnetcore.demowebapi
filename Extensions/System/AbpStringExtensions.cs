@@ -43,12 +43,6 @@ namespace System {
             return string.IsNullOrEmpty (str);
         }
 
-        public static string IsNullToString (this string str, string defaultstr = "") {
-            if (string.IsNullOrEmpty (str) || string.IsNullOrWhiteSpace (str))
-                return defaultstr;
-            return str;
-        }
-
         /// <summary>
         /// indicates whether this string is null, empty, or consists only of white-space characters.
         /// </summary>
